@@ -38,12 +38,6 @@ spec:
           ports:
             - name: minecraft
               containerPort: 25565
-          readinessProbe:
-            tcpSocket:
-              port: minecraft
-          livenessProbe:
-            tcpSocket:
-              port: minecraft
           resources:
             {{- toYaml (index .Values.resources "hypixel-router") | nindent 12 }}
           volumeMounts:
