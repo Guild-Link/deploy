@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hypixel-router
+  labels:
+    app.kubernetes.io/name: hypixel-router
+    app.kubernetes.io/part-of: guildlink
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  serviceName: hypixel-router
+  replicas: {{ index .Values.replicas "hypixel-router" }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hypixel-router
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hypixel-router
+        app.kubernetes.io/part-of: guildlink
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65532
+        runAsUser: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: hypixel-router
+          image: {{ index .Values.images "cf-router" }}
+          env:
+            - name: FORWARDS
+              value: "0.0.0.0:25565=mc.hypixel.net:25565"
+          ports:
+            - name: minecraft
+              containerPort: 25565
+          readinessProbe:
+            tcpSocket:
+              port: minecraft
+          livenessProbe:
+            tcpSocket:
+              port: minecraft
+          resources:
+            {{- toYaml (index .Values.resources "hypixel-router") | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: hypixel-router
+          app.kubernetes.io/part-of: guildlink
+          app.kubernetes.io/instance: {{ .Release.Name }}
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hypixel-router
+  labels:
+    app.kubernetes.io/name: hypixel-router
+    app.kubernetes.io/part-of: guildlink
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  selector:
+    app.kubernetes.io/name: hypixel-router
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - port: {{ index .Values.ports "hypixel-router" }}
+      targetPort: minecraft

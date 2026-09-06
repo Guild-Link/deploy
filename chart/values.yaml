@@ -7,22 +7,31 @@ images:
 
 ports:
   compatlink: 80
+  hypixel-router: 25565
   valkey: 6379
 
 replicas:
   compatlink: 1
+  hypixel-router: 1
 
 resources:
   compatlink:
     requests:
-      cpu: 10m
+      cpu: 100m
       memory: 128Mi
     limits:
       memory: 256Mi
 
+  hypixel-router:
+    requests:
+      cpu: 100m
+      memory: 32Mi
+    limits:
+      memory: 64Mi
+
   valkey:
     requests:
-      cpu: 10m
-      memory: 128Mi
+      cpu: 100m
+      memory: 512Mi
     limits:
-      memory: 256Mi
+      memory: 512Mi
