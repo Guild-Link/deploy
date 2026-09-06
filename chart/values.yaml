@@ -3,3 +3,26 @@ images:
   cf-router: ghcr.io/guild-link/cf-router@sha256:b03259638788421f93b3008cdd88f4e2227e3e65f177dc1f43c2b49d3f72b9ad
   backend: ghcr.io/guild-link/backend@sha256:d6e07fc8c3bfcf06d776ea5e0ba82f71039462deeb729576a6dcfe967edd6ac7
   worker: ghcr.io/guild-link/worker@sha256:abf9a5cc7074964c0240c738575c59fb643a5fc83ed4239f0e2729c09a5a6284
+  valkey: valkey/valkey:latest
+
+ports:
+  compatlink: 80
+  valkey: 6379
+
+replicas:
+  compatlink: 1
+
+resources:
+  compatlink:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
+
+  valkey:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
